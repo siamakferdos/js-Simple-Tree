@@ -98,6 +98,7 @@ var Tree = function (name, data, target) {
         };
         
         this.select = function(idsArray){
+            $("div[" + treeNameAttr +"] li span[data-text]").removeClass("active");
             $("div[" + treeNameAttr +"] li").removeClass("open");
             var f = idsArray.map(function(value){
                  $("div[" + treeNameAttr +"] li[data-value='"+value+"'] > span[data-text]").addClass("active");                 
