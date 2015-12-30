@@ -1,12 +1,14 @@
 var Tree = function (name, data, target) {
         
         this.rtl = false;
-        this.allowCheck = true;
-        this.allowMultiSelect = true;
-        this.allowEditName = true;
+        this.allowCheck = false;
+        this.allowMultiSelect = false;
+        this.allowEditName = false;
+        this.allowMove = false;
         
         var multiSelect = false;
-        var allowEdit = true;
+        var allowEdit = false;
+        var allowMoveItem = false;
         
         var treeData = data;
         var mainStack = new Array();
@@ -15,7 +17,6 @@ var Tree = function (name, data, target) {
         var triggers = {};
         triggers.select = null;
         triggers.unSelect = null;
-        triggers.dblClick = null;
         triggers.append = null;
         triggers.remove = null;
         triggers.move = null;
@@ -114,7 +115,8 @@ var Tree = function (name, data, target) {
          var rtlStatusImage  =  (this.rtl == true) ? imgLeft : imgRight;
          
          multiSelect = this.allowMultiSelect;
-         allowEdit = this.allowEditName
+         allowEdit = this.allowEditName;
+         allowMoveItem = this.allowMove;
          
             Array.prototype.push.apply(mainStack, treeData.filter(function(value){
                     return (!value.parentId)
@@ -236,9 +238,6 @@ var Tree = function (name, data, target) {
                             "' data-old-value='" + $(this).text() + "' ><button type='button' data-name='btnConfirm' style=''></button>"); 
                         $(this).find("input[type='text']").select().focus();                       
                     }
-                         
-                    if(triggers["dblClick"] != null)
-                        triggers["dblClick"]($(this).closest("li").attr("data-value"));
                 })
                 
                 $(document).on("click", "div[" + treeNameAttr +"] li button[data-name='btnConfirm']", function(e){
@@ -262,66 +261,68 @@ var Tree = function (name, data, target) {
                     $(this).select().focus();
                 })
                 
-                var drag = null;
-                var oldParent = null;
-                var drop = null;  
-                
-                $(document).on("mousedown", "div[" + treeNameAttr +"] li span[data-text]", function(e){
-                    $(this).attr("draggable", "true");  
-                    drag = drop = null;                 
-                })
-                
-                $(document).on("mouseup", "div[" + treeNameAttr +"] li span[data-text]", function(e){
-                    $(this).attr("draggable", "false");
-                    // drag = drop = null;                   
-                })
-                
-                $(document).on("dragover", "div[" + treeNameAttr +"] li span[data-text]", function(e){
-                    e.preventDefault();
-                });
-                
-                $(document).on("dragstart", "div[" + treeNameAttr +"] li span[data-text]", function(e){
-                    if(drag == null){
-                        drag = $(this).parent("li");
-                        if(drag.parents("li").length > 0)
-                            oldParent =drag.parent().closest("li").attr("data-value");
-                         else
-                            oldParent = null;
-                    }
-                    e.originalEvent.dataTransfer.setData("Text",e.target.id);
-                });
-                $(document).on("drop", "div[" + treeNameAttr +"] li span", function(e){                    
-                    if(drop == null){
-                            // var dragParent;
-                            // if(drag.parent("ul").find("li").length > 1)
-                            //     dragParent = drag.parent("ul");
-                        drop = $(this).parent("li");
-                        if(drag.find("li[data-value='" + drop.attr("data-value") + "']").length == 0 ){
-                            if(drop.children("ul").length > 0){
-                                // drop.children("ul").append(drag);                        
-                                drag.detach().appendTo(drop.find("ul")[0]);
-                                drop.addClass("open");
-                            }
-                            else{
-                                // drop.detach().append($("<ul>" + drag.html() + "</ul>"));                            
-                                $("<img data-status src='" + imgDown + "'>").prependTo(drop);
-                                $("<ul></ul>").appendTo(drop);
-                                drag.detach().appendTo(drop.find("ul")[0]);
-                            }
-                            // if(dragParent)
-                            //     dragParent.remove(); 
-                            $("div[" + treeNameAttr +"] ul:empty").parent("li").find("img[data-status]")
-                                .replaceWith("<span data-space></span>");
-                            // $("div[" + treeNameAttr +"] ul:empty").closest("li:not(:has(span[data-space]))");                       
-                            $("div[" + treeNameAttr +"] ul:empty").remove();
-                            
-                            $("div[" + treeNameAttr +"] li img[data-status]").parent("li").children("span[data-space]").remove();
-                            
-                            if(triggers["move"] != null)
-                                triggers["move"](drag.attr("data-value"), drop.attr("data-value"), oldParent);
+                if(allowMoveItem){
+                    var drag = null;
+                    var oldParent = null;
+                    var drop = null;  
+                    
+                    $(document).on("mousedown", "div[" + treeNameAttr +"] li span[data-text]", function(e){
+                        $(this).attr("draggable", "true");  
+                        drag = drop = null;                 
+                    })
+                    
+                    $(document).on("mouseup", "div[" + treeNameAttr +"] li span[data-text]", function(e){
+                        $(this).attr("draggable", "false");
+                        // drag = drop = null;                   
+                    })
+                    
+                    $(document).on("dragover", "div[" + treeNameAttr +"] li span[data-text]", function(e){
+                        e.preventDefault();
+                    });
+                    
+                    $(document).on("dragstart", "div[" + treeNameAttr +"] li span[data-text]", function(e){
+                        if(drag == null){
+                            drag = $(this).parent("li");
+                            if(drag.parents("li").length > 0)
+                                oldParent =drag.parent().closest("li").attr("data-value");
+                            else
+                                oldParent = null;
                         }
-                    }                    
-                });
+                        e.originalEvent.dataTransfer.setData("Text",e.target.id);
+                    });
+                    $(document).on("drop", "div[" + treeNameAttr +"] li span", function(e){                    
+                        if(drop == null){
+                                // var dragParent;
+                                // if(drag.parent("ul").find("li").length > 1)
+                                //     dragParent = drag.parent("ul");
+                            drop = $(this).parent("li");
+                            if(drag.find("li[data-value='" + drop.attr("data-value") + "']").length == 0 ){
+                                if(drop.children("ul").length > 0){
+                                    // drop.children("ul").append(drag);                        
+                                    drag.detach().appendTo(drop.find("ul")[0]);
+                                    drop.addClass("open");
+                                }
+                                else{
+                                    // drop.detach().append($("<ul>" + drag.html() + "</ul>"));                            
+                                    $("<img data-status src='" + imgDown + "'>").prependTo(drop);
+                                    $("<ul></ul>").appendTo(drop);
+                                    drag.detach().appendTo(drop.find("ul")[0]);
+                                }
+                                // if(dragParent)
+                                //     dragParent.remove(); 
+                                $("div[" + treeNameAttr +"] ul:empty").parent("li").find("img[data-status]")
+                                    .replaceWith("<span data-space></span>");
+                                // $("div[" + treeNameAttr +"] ul:empty").closest("li:not(:has(span[data-space]))");                       
+                                $("div[" + treeNameAttr +"] ul:empty").remove();
+                                
+                                $("div[" + treeNameAttr +"] li img[data-status]").parent("li").children("span[data-space]").remove();
+                                
+                                if(triggers["move"] != null)
+                                    triggers["move"](drag.attr("data-value"), drop.attr("data-value"), oldParent);
+                            }
+                        }                    
+                    });
+                }
             })
     }  
     
