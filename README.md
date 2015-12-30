@@ -1,5 +1,7 @@
 # js-Simple-Tree
-A simple tree for java script include Append, Edit, Delete, Drag&amp;Drop, Rename and their events, ...
+A simple tree for java script include Append, Edit, Delete, Drag&amp;Drop(move), Rename and their events, ...
+
+This tree Support **RTL(Right To Left)**
 
 # Get start
 
@@ -55,8 +57,80 @@ To append new item to tree you can use this method with this syntax:
      
 ### remove
 To remove an item from tree use this method with this syntax:
+
     myTree.remove(id)
 
 ### getCheckedValues
-This method return an array of checked values with this syntax: 
+This method returns an array of checked values (ids) with this syntax:
+
     myTree.getCheckedValues()
+    
+### getSelectedValues
+This method returns an array of selected values (ids) with this syntax:
+
+    myTree.getSelectedValues()
+    
+### edit
+To edit an item use this method:
+
+    myTree.edit(id, "Edited Value", extraData)
+
+### select
+This method will take an array of ids and select them on tree:
+
+    myTree.select([1, 5, 8, 9, 10])
+    
+## Tree events
+There are some events on Tree commands. All events accour after command running :
+### select, unSelect, append, remove
+These events give you an id that you can work with it.
+    
+     myTree.on("select", function(id){
+           alert("selected: " + id); 
+    })
+     myTree.on("unSelect", function(id){
+       alert("unSelect: " + id); 
+    })
+    myTree.on("append", function(id){
+        alert("APPENDED:" + id)
+    });
+    myTree.on("remove", function(id){
+        alert("REMOVED:" + id)
+    });
+    
+### move
+This event accour after drag and drop(move) an item of tree:
+
+    myTree.on("move", function(id, newParent, oldParent){
+            alert("MOVED: id=" + id + "  new parent=" + newParent + " old parent=" + oldParent)
+    });
+        
+### rename
+After rename an item this event happend:
+
+    myTree.on("rename", function(id, name, oldName){
+            alert("renamed: id=" + id + "  new name=" + name + " old name=" + oldName)
+    });
+    
+## Options
+There are some optional setting you can set on tree after create Tree object and before build it:
+### rtl(Right To Left)
+Default value is `false`.
+
+    myTree.rtl = true;
+### allowCheck
+It append checkbox to every item on tree. Default value is `false`:
+
+    myTree.allowCheck = true;
+### allowMultiSelect
+Default value is `false`.
+
+    myTree.allowMultiSelect = true;
+### allowEditName
+By set this, by click on an item, a textbox and confirm button will apper that you can change the item name. Default value is `false`:
+
+    myTree.allowEditName = true;
+### allowMove
+This option will allow you drag and drop(move) item on tree to change an item parent. Default value is `false`:
+
+    myTree.allowMove = true;
