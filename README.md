@@ -1,5 +1,5 @@
 # js-Simple-Tree
-A simple tree for Javascript include Append, Edit, Delete, Drag&amp;Drop(move), Rename and their events, ...
+A simple tree for Javascript includes Append, Edit, Delete, Drag&amp;Drop(move), Rename and their events, ...
 
 This tree Support **RTL(Right To Left)**
 
